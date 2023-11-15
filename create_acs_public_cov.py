@@ -1,11 +1,12 @@
 import yaml
+import json
 from rdt import HyperTransformer
 from rdt.transformers import LabelEncoder
 from folktables import ACSDataSource, ACSPublicCoverage
 
 
 if __name__ == "__main__":
-    year = '2022'
+    year = '2021'
     data_source = ACSDataSource(survey_year=year,
                                 horizon='1-Year',
                                 survey='person')
@@ -62,15 +63,22 @@ if __name__ == "__main__":
     dataset_name = f"acs_public_cov_{year}"
     df.to_csv(f"{dataset_name}.csv", index_label="ID")
 
-    # create schema
+    # create schema and domain
     schema_dict = {}
+    domain_dict = {}
     feature_names = df.columns
     for f in feature_names:
         col = df[f]
         min_value = 0
         max_value = col.max()
         schema_dict[f] = list(range(min_value, max_value + 1))
+        domain_dict[f] = int(max_value - min_value + 1)
 
     # save schema
-    with open(f"{dataset_name}_schema.yaml", "w") as file:
-        yaml.dump(schema_dict, file)
+    with open(f"{dataset_name}_schema.yaml", "w") as sch_file:
+        yaml.dump(schema_dict, sch_file)
+
+    # save domain
+    with open(f"{dataset_name}-domain.json", "w") as dom_file:
+        json_obj = json.dumps(domain_dict)
+        dom_file.write(json_obj)
