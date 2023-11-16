@@ -173,6 +173,7 @@ def public_coverage_filter(data):
 
 ACSPublicCoverage = folktables.BasicProblem(
     features=[
+        'SERIALNO',
         'AGEP',
         'SCHL',
         'MAR',
